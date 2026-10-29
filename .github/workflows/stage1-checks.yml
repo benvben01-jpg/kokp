@@ -20,6 +20,20 @@ jobs:
     name: Verify foundation
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_DB: athar
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d athar"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     env:
       DATABASE_URL: postgresql://ci@127.0.0.1:5432/athar?schema=public
       NEXTAUTH_URL: http://localhost:3000
@@ -43,6 +57,9 @@ jobs:
 
       - name: Validate Prisma schema
         run: npm run db:validate
+
+      - name: Apply migrations to ephemeral PostgreSQL
+        run: npm run db:deploy
 
       - name: Run lint
         run: npm run lint
