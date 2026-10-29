@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  FOLLOW_UP
+  STUDENT
+  SUPPORT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  fullName     String   @db.VarChar(120)
+  email        String   @unique @db.VarChar(254)
+  passwordHash String   @db.VarChar(255)
+  role         UserRole
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([role, isActive], map: "User_role_isActive_idx")
+}
+
+model AdminBootstrap {
+  key         String   @id @db.VarChar(64)
+  completedAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model LoginThrottle {
+  keyHash        String    @id @db.Char(64)
+  failures       Int       @default(0)
+  windowStartedAt DateTime @default(now()) @db.Timestamptz(3)
+  blockedUntil   DateTime? @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([updatedAt], map: "LoginThrottle_updatedAt_idx")
+}
