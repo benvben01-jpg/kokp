@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const forwardedAddress = request.headers["x-forwarded-for"]?.split(",")[0]?.trim().slice(0, 64) || "unknown";
+        const forwardedAddress = request.headers?.["x-forwarded-for"]?.split(",")[0]?.trim().slice(0, 64) || "unknown";
         const keyHash = createLoginThrottleKey(parsed.data.email, forwardedAddress);
         const allowed = await reserveLoginAttempt(keyHash);
         if (!allowed) {

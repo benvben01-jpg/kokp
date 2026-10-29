@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { createLoginThrottleKey } from "@/lib/security";
 
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
